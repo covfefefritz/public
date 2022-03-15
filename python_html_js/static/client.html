@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Twidder</title>
+    <!-- Meta Tags -->
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/x-icon" href="/static/favicon.jpg">
+    <!-- Bootstrap and project CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <link href="static/client.css" type="text/css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/node-forge@1.0.0/dist/forge.min.js"></script>
+    <script src="static/client.js"></script>
+
+    <script type="text/html" id="welcomeview">
+      <div class="container" style="max-width: 800px;">
+        <div class="row">
+          <div class="col" style="display: flex; align-items: center;">
+            <img src="static/wimage.png" style="width: 23rem; margin: auto;"/>
+          </div>
+          <div class="col gridblock">
+            <form class="row loginform" onsubmit="signInClient(); return false;" oninput="resetValidity(this);">
+              <div class="inputContainer">
+                <label for="login_email">Email</label>
+                <input type="email" id="login_email" required class="form-control form-control-sm" placeholder="name@email.com">
+              </div>
+              <div class="inputContainer">
+                <label for="password">Password</label>
+                <input type="password" id="password" required class="form-control form-control-sm" placeholder="●●●●●●●●">
+              </div>
+              <input type="submit" value="Log In" id="login" class="btn btn-secondary btn-sm"/>
+              <input type="button" value="Reset Pass" id="resetpass" class="btn btn-secondary btn-sm" onclick="forgotPass()"/>
+            </form>
+            <form class="row signupform" id="signupform" onsubmit="signUpClient(); return false;" oninput="resetValidity(this);">
+              <!-- <h4 style="padding-left: 2%; padding-top: 2%;">Sign up here!</h4> -->
+              <div class="inputContainer">
+                <label for="firstname">First name</label>
+                <input type="text" id="firstname" required class="form-control form-control-sm" placeholder="John">
+              </div>
+              <div class="inputContainer">
+                <label for="lastname">Family name</label>
+                <input type="text" id="lastname" required class="form-control form-control-sm" placeholder="Doe">
+              </div>
+              <div class="inputContainer">
+                <label for="gender">Gender</label>
+                <select id="gender" class="form-select form-select-sm" style="width: 70%; float: right;">
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+              <div class="inputContainer">
+                <label for="city">City</label>
+                <input type="text" id="city" required class="form-control form-control-sm" placeholder="New York">
+              </div>
+              <div class="inputContainer">
+                <label for="country">Country</label>
+                <input type="text" id="country" required class="form-control form-control-sm" placeholder="United States">
+              </div>
+              <div class="inputContainer">
+                <label for="signup_email">Email</label>
+                <input type="email" id="signup_email" required class="form-control form-control-sm" placeholder="name@email.com">
+              </div>
+              <div class="inputContainer">
+                <label for="password1">Password</label>
+                <input type="password" id="password1" required minlength="5" class="form-control form-control-sm" placeholder="●●●●●●●●">
+              </div>
+              <div class="inputContainer">
+                <label for="password2">Repeat pass</label>
+                <input type="password" id="password2" required minlength="5" class="form-control form-control-sm" placeholder="●●●●●●●●">
+              </div>
+              <input type="submit" id="signup" value="Sign Up" class="btn btn-secondary btn-sm"/>
+            </form>
+          </div>
+        </div>
+      </div>
+    </script>
+
+    <script type="text/html" id="profileview">
+      <h1 id="tabTitle">Twidder</h1>
+      <div class="input-group mb-2">
+        <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">Theme</button>
+        <ul class="dropdown-menu" id="theme-menu" onclick="changeTheme(event);">
+          <li><a class="dropdown-item" href="#">Light</a></li>
+          <li><a class="dropdown-item" href="#">Dark</a></li>
+          <li><hr class="dropdown-divider"></li>
+          <li><a class="dropdown-item" href="#">Spook</a></li>
+        </ul>
+      </div>
+      <!-- <input type="button" id="getLocBtn" value="Get location" onclick="getLocation()"/>
+      <p id="geolocation"></p> -->
+
+      <div class="tabheader" id="tabheader">
+        <button id="homeTab" class="btn btn-secondary tab" onclick="openTab(event, 'Home')">Home</button>
+        <button id="browseTab" class="btn btn-secondary tab" onclick="openTab(event, 'Browse')">Browse</button>
+        <button id="accountTab" class="btn btn-secondary tab" onclick="openTab(event, 'Account')">Account</button>
+        <input type="button" value="Log Out" onclick="logout()" class="btn btn-secondary logout float-end"/>
+      </div>
+
+      <div class="contentwrapper">
+        <div id="Home" class="tabcontent">
+          <div id="personalinfo" class="flexbox">
+            <h3>Personal details</h3>
+          </div>
+          <div id="wall" class="flexbox">
+            <h3>Wall</h3>
+          </div>
+          <input type="button" id="wallRefresh" value="Refresh" onclick="printwall(localStorage.getItem('token'))" class="btn btn-secondary btn-sm">
+          <div id="newpost" class="flexbox">
+            <h3>Post to wall</h3>        
+            <div style="margin-left: 2%; margin-right: 2%;">
+              <textarea id="post" class="form-control" placeholder="Post something ..."></textarea><br>
+            </div>    
+            <input type="button" id="wallPost" value="Post!" onclick="posttowall(post.value, '')" class="btn btn-secondary btn-sm">
+          </div>
+        </div>
+        <div id="Browse" class="tabcontent">
+          <div id="searchUser" class="flexbox">
+            <h3>Search user by email</h3>
+            <div class="searchInput">
+              <input style="width: 70%; float: left;" type="email" id="usr" required class="form-control" placeholder="name@mail.com">
+              <input style="width: 30%; float: right;" type="button" id="searchUserBtn" value="search" onclick="loaduserdata(document.getElementById('usr').value)" class="btn btn-secondary btn-sm">
+            </div>
+          </div>
+          <div id="searchRes" class="flexbox"></div>
+          <div id="browseWall" class="flexbox">
+            <h3>Wall</h3>
+          </div>
+          <input type="button" id="browseWallRefresh" value="Refresh" onclick="printwall(localStorage.getItem('token'), document.getElementById('usr').value)" class="btn btn-secondary btn-sm">
+          <div id="newpostBrowse" class="flexbox">
+            <h3>Post to wall</h3>
+            <div style="margin-left: 2%; margin-right: 2%;">
+              <textarea id="browsePost" class="form-control" placeholder="Post something ..."></textarea><br>
+            </div>
+            <input type="button" id="wallPost" value="Post!" onclick="posttowall(browsePost.value, document.getElementById('usr').value)" class="btn btn-secondary btn-sm">
+          </div>
+        </div>
+        <div id="Account" class="tabcontent">
+          <div class="flexbox" style="width: 100%;">
+            <h3>Change password</h3>
+            <form class="changepwform" onsubmit="changePasswordClient(); return false;" oninput="resetValidity(this);">
+              <div class="inputContainer" style="margin-bottom: 2%;">
+                <label for="changepw">Current password</label>
+                <input type="password" id="changepw" required minlength="5" class="form-control form-control-sm">
+              </div>
+              <div class="inputContainer" style="margin-bottom: 2%;">
+                <label for="newpw1">New password</label>
+                <input type="password" id="newpw1" required minlength="5" class="form-control form-control-sm">
+              </div>
+              <div class="inputContainer">
+                <label for="newpw2">Confirm new password</label>
+                <input type="password" id="newpw2" required minlength="5" class="form-control form-control-sm">
+              </div>
+              <input type="submit" id="changepwBtn" value="Change password" class="btn btn-secondary btn-sm">
+            </form>
+          </div>
+        </div>  
+      </div>
+    </script>
+  </head>
+  
+  <body>
+    <div id="welcome">
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+  </body>
+</html>
